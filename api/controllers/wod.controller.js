@@ -49,6 +49,8 @@ const removeUser = async (req, res) => {
 
     const result = await wod.removeParticipants(userId);
 
+    await wod.reload();
+
     res.status(201).json({ status: !!result, wod });
   } catch (error) {
     res.status(500).send({ status: false, message: error.message });

@@ -6,8 +6,11 @@ const logger = require('morgan');
 
 //import db
 require('./db/db.init');
+
 //import middlewares
 const { protect } = require('./middlewares/auth.js');
+const controlMembershipDate = require('./middlewares/control.membership.date');
+
 //import controllers
 const { signup, signin } = require('./api/controllers/auth.controller');
 
@@ -33,7 +36,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 //Middlewares
-app.use('/api', protect);
+app.use('/api', protect, controlMembershipDate);
 
 //Routers
 app.post('/signup', signup);

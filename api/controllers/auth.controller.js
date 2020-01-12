@@ -32,20 +32,29 @@ module.exports.signup = async (req, res) => {
     const hashPassword = await bcrypt.hash(req.body.password, 10);
     req.body.password = hashPassword;
 
-    const { firstName, lastName, email, password } = req.body;
+    const {
+      firstName,
+      lastName,
+      email,
+      password,
+      startOfMembership,
+      endOfMembership
+    } = req.body;
 
     const newUser = await User.create({
       firstName,
       lastName,
       email,
-      password
+      password,
+      startOfMembership,
+      endOfMembership
     });
 
     const token = createNewToken(newUser);
     return res.status(201).send({ status: true, token, user: newUser });
   } catch (error) {
-    console.error(error.errors);
-    return res.status(500).end();
+    console.error(error.message);
+    return res.status(500).send({ status: false, message: error.message });
   }
 };
 

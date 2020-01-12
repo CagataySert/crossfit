@@ -25,14 +25,14 @@ const User = db.define('user', {
     }
   },
   password: {
-    type: Sequelize.STRING(20),
+    type: Sequelize.STRING(),
     allowNull: false
   },
-  startOfSubs: {
+  startOfMembership: {
     type: Sequelize.INTEGER,
     allowNull: true
   },
-  endOfSubs: {
+  endOfMembership: {
     type: Sequelize.INTEGER,
     allowNull: true
   }
