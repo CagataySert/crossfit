@@ -19,11 +19,32 @@ const addUser = async (req, res) => {
         }
       ]
     });
+
+    if (!wod) {
+      return res.status(403).send({
+        status: false,
+        message: 'wod could not have been found.'
+      });
+    }
+
+    //check wod entry time whether is started or not.
+    const currentDate = new Date();
+    const dateOfWod = new Date(wod.date * 1000);
+    const startOfWodEntryTime = dateOfWod.setDate(dateOfWod.getDate() - 2);
+
+    if (currentDate < startOfWodEntryTime) {
+      return res.status(403).send({
+        status: false,
+        message:
+          'you can register for your training 48 hours before the earliest.'
+      });
+    }
+
     //check capacity if full.
     if (wod.Participants.length >= wod.capacity) {
-      res.status(403).send({
+      return res.status(403).send({
         status: false,
-        message: 'Capacity of this class is full!'
+        message: 'capacity of this class is full!'
       });
     }
 
@@ -32,8 +53,8 @@ const addUser = async (req, res) => {
 
     res.status(201).json({ status: !!result, wod });
   } catch (error) {
-    res.status(500).send({ status: result, message: error.message });
     console.log(error.message);
+    return res.status(500).send({ status: result, message: error.message });
   }
 };
 
@@ -42,10 +63,19 @@ const removeUser = async (req, res) => {
     const { userId, wodId } = req.body;
 
     if (!userId || !wodId) {
-      res.status(400).send({ status: false, message: 'need userId and wodId' });
+      return res
+        .status(400)
+        .send({ status: false, message: 'need userId and wodId' });
     }
 
     const wod = await Wod.findByPk(wodId);
+
+    if (!wod) {
+      return res.status(403).send({
+        status: false,
+        message: 'wod could not have been found.'
+      });
+    }
 
     const result = await wod.removeParticipants(userId);
 
@@ -53,8 +83,8 @@ const removeUser = async (req, res) => {
 
     res.status(201).json({ status: !!result, wod });
   } catch (error) {
-    res.status(500).send({ status: false, message: error.message });
     console.log(error.message);
+    return res.status(500).send({ status: false, message: error.message });
   }
 };
 
@@ -63,7 +93,7 @@ const getWodWithUsers = async (req, res) => {
     const { id } = req.query;
 
     if (!id) {
-      res.status(400).send({ status: false, message: 'need wodId' });
+      return res.status(400).send({ status: false, message: 'need wodId' });
     }
 
     const wodWitUsers = await Wod.findByPk(id, {
@@ -78,8 +108,8 @@ const getWodWithUsers = async (req, res) => {
 
     res.status(201).json({ status: true, wodWitUsers });
   } catch (error) {
-    res.status(500).send({ status: false, message: error.message });
     console.log(error.message);
+    return res.status(500).send({ status: false, message: error.message });
   }
 };
 

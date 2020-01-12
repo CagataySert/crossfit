@@ -5,6 +5,7 @@ const controlMembershipDate = (req, res, next) => {
     const currentDate = new Date();
     const endOfMembershipHumanized = new Date(endOfMembership * 1000);
 
+    //Check user's membership whether is still active or not.
     if (currentDate > endOfMembershipHumanized) {
       return res
         .status(401)
