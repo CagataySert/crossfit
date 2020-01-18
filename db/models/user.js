@@ -35,6 +35,10 @@ const User = db.define('user', {
   endOfMembership: {
     type: Sequelize.INTEGER,
     allowNull: true
+  },
+  isAdmin: {
+    type: Sequelize.BOOLEAN,
+    defaultValue: false
   }
 });
 

@@ -1,5 +1,10 @@
 const controlMembershipDate = (req, res, next) => {
   try {
+    //check user whether is admin or not.
+    if (req.user.isAdmin) {
+      return next();
+    }
+
     const { endOfMembership } = req.user;
 
     const currentDate = new Date();

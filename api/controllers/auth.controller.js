@@ -38,7 +38,8 @@ module.exports.signup = async (req, res) => {
       email,
       password,
       startOfMembership,
-      endOfMembership
+      endOfMembership,
+      isAdmin
     } = req.body;
 
     const newUser = await User.create({
@@ -47,13 +48,14 @@ module.exports.signup = async (req, res) => {
       email,
       password,
       startOfMembership,
-      endOfMembership
+      endOfMembership,
+      isAdmin
     });
 
     const token = createNewToken(newUser);
     return res.status(201).send({ status: true, token, user: newUser });
   } catch (error) {
-    console.error(error.message);
+    console.error(error);
     return res.status(500).send({ status: false, message: error.message });
   }
 };
