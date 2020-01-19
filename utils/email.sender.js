@@ -1,4 +1,3 @@
-const cron = require('node-cron');
 const nodemailer = require('nodemailer');
 require('dotenv').config();
 
@@ -23,16 +22,8 @@ const emailSender = (sendTo, subject, text) => {
   const message = messageConfig(sendTo, subject, text);
 
   transporter.sendMail(message, mailData => {
-    console.log('mail data: ', mailData);
+    console.log('mail data: ', mailData, 'send to: ', sendTo);
   });
 };
-
-// const emailSenderWithCron = (sendTo, subject, text) => {
-//   cron.schedule('*/15 * * * * *', () => {
-//     transporter.sendMail(messageConfig, mailData => {
-//       console.log('mail data: ', mailData);
-//     });
-//   });
-// };
 
 module.exports = emailSender;

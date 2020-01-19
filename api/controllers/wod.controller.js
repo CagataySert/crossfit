@@ -1,13 +1,14 @@
 const crudControllers = require('./crud.controller');
 const Wod = require('../../db/models/wod');
 const User = require('../../db/models/user');
+const statusCodeMessages = require('../../utils/status.codes');
 
 const addUser = async (req, res) => {
   try {
     const { userId, wodId } = req.body;
 
     if (!userId || !wodId) {
-      res.status(400).send({ status: false, message: 'need userId and wodId' });
+      res.status(400).json({ status: false, message: statusCodeMessages[400] });
     }
 
     const wod = await Wod.findByPk(wodId, {
@@ -21,9 +22,9 @@ const addUser = async (req, res) => {
     });
 
     if (!wod) {
-      return res.status(403).send({
+      return res.status(600).json({
         status: false,
-        message: 'wod could not have been found.'
+        message: statusCodeMessages[600]
       });
     }
 
@@ -33,28 +34,29 @@ const addUser = async (req, res) => {
     const startOfWodEntryTime = dateOfWod.setDate(dateOfWod.getDate() - 2);
 
     if (currentDate < startOfWodEntryTime) {
-      return res.status(403).send({
+      return res.status(601).json({
         status: false,
-        message:
-          'you can register for your training 48 hours before the earliest.'
+        message: statusCodeMessages[601]
       });
     }
 
     //check capacity if full.
     if (wod.Participants.length >= wod.capacity) {
-      return res.status(403).send({
+      return res.status(602).json({
         status: false,
-        message: 'capacity of this class is full!'
+        message: statusCodeMessages[602]
       });
     }
 
     const result = await wod.addParticipants(userId);
     await wod.reload();
 
-    res.status(201).json({ status: !!result, wod });
+    return res
+      .status(201)
+      .json({ status: !!result, wod, message: statusCodeMessages[201] });
   } catch (error) {
     console.log(error.message);
-    return res.status(500).send({ status: result, message: error.message });
+    return res.status(500).json({ status: result, message: error.message });
   }
 };
 
@@ -65,15 +67,15 @@ const removeUser = async (req, res) => {
     if (!userId || !wodId) {
       return res
         .status(400)
-        .send({ status: false, message: 'need userId and wodId' });
+        .json({ status: false, message: statusCodeMessages[400] });
     }
 
     const wod = await Wod.findByPk(wodId);
 
     if (!wod) {
-      return res.status(403).send({
+      return res.status(600).json({
         status: false,
-        message: 'wod could not have been found.'
+        message: statusCodeMessages[600]
       });
     }
 
@@ -81,10 +83,12 @@ const removeUser = async (req, res) => {
 
     await wod.reload();
 
-    res.status(201).json({ status: !!result, wod });
+    return res
+      .status(201)
+      .json({ status: !!result, wod, message: statusCodeMessages[201] });
   } catch (error) {
     console.log(error.message);
-    return res.status(500).send({ status: false, message: error.message });
+    return res.status(500).json({ status: false, message: error.message });
   }
 };
 
@@ -93,7 +97,9 @@ const getWodWithUsers = async (req, res) => {
     const { id } = req.query;
 
     if (!id) {
-      return res.status(400).send({ status: false, message: 'need wodId' });
+      return res
+        .status(400)
+        .json({ status: false, message: statusCodeMessages[400] });
     }
 
     const wodWitUsers = await Wod.findByPk(id, {
@@ -106,10 +112,17 @@ const getWodWithUsers = async (req, res) => {
       ]
     });
 
-    res.status(201).json({ status: true, wodWitUsers });
+    if (!wodWitUsers) {
+      return res.status(600).json({
+        status: false,
+        message: statusCodeMessages[600]
+      });
+    }
+
+    return res.status(201).json({ status: true, wodWitUsers });
   } catch (error) {
     console.log(error.message);
-    return res.status(500).send({ status: false, message: error.message });
+    return res.status(500).json({ status: false, message: error.message });
   }
 };
 

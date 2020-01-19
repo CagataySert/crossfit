@@ -3,6 +3,7 @@ const User = require('../../db/models/user');
 const bcrypt = require('bcrypt');
 const passwordGenerator = require('generate-password');
 const emailSender = require('../../utils/email.sender');
+const statusCodeMessages = require('../../utils/status.codes');
 
 const createUser = async (req, res) => {
   try {
@@ -10,7 +11,7 @@ const createUser = async (req, res) => {
     if (!req.user.isAdmin)
       return res.status(403).json({
         status: false,
-        message: 'you do not have permission to create user!'
+        message: statusCodeMessages[403]
       });
 
     const {
@@ -23,9 +24,9 @@ const createUser = async (req, res) => {
     } = req.body;
 
     if (!email || !firstName || !lastName) {
-      return res.status(400).send({
+      return res.status(400).json({
         status: false,
-        message: 'need email,first name and last name.'
+        message: statusCodeMessages[400]
       });
     }
 
@@ -55,7 +56,9 @@ const createUser = async (req, res) => {
       );
     }
 
-    return res.status(201).json({ status: true, user: newUser });
+    return res
+      .status(201)
+      .json({ status: true, user: newUser, message: statusCodeMessages[201] });
   } catch (error) {
     console.log(error.message);
     return res.status(500).json({ status: false, message: error.message });

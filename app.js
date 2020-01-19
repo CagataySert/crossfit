@@ -3,6 +3,7 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+const notifyUserEndOfMembership = require('./utils/notify.user.membership.date');
 
 //import db
 require('./db/db.init');
@@ -47,6 +48,9 @@ app.use('/api/coach', coachRouter);
 app.use('/api/movement', movementRouter);
 app.use('/api/section', sectionRouter);
 app.use('/api/wod', wodRouter);
+
+//check user endOfMembershipDate with cron everyday
+notifyUserEndOfMembership();
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

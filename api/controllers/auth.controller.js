@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const jwtConfig = require('../../config/jwt');
 const bcrypt = require('bcrypt');
 const User = require('../../db/models/user');
+const statusCodeMessages = require('../../utils/status.codes');
 
 const createNewToken = user => {
   return jwt.sign({ id: user.id }, jwtConfig.secretKey, {
@@ -16,16 +17,16 @@ module.exports.signup = async (req, res) => {
     !req.body.firstName ||
     !req.body.lastName
   ) {
-    return res.status(400).send({
+    return res.status(400).json({
       status: false,
-      message: 'need email, password,first name and last name.'
+      message: statusCodeMessages[400]
     });
   }
 
   if (req.body.password.length < 5)
-    res.status(400).send({
+    return res.status(400).json({
       status: false,
-      message: 'password must be greater than 5 characters'
+      message: statusCodeMessages[400]
     });
 
   try {
@@ -53,19 +54,25 @@ module.exports.signup = async (req, res) => {
     });
 
     const token = createNewToken(newUser);
-    return res.status(201).send({ status: true, token, user: newUser });
+    return res.status(201).json({
+      status: true,
+      token,
+      user: newUser,
+      message: statusCodeMessages[201]
+    });
   } catch (error) {
     console.error(error);
-    return res.status(500).send({ status: false, message: error.message });
+    return res.status(500).json({ status: false, message: error.message });
   }
 };
 
+//Todo: yanlış giriş ypaınca patlıyor, kontrol et
 module.exports.signin = async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
     return res
       .status(400)
-      .send({ status: false, message: 'need email and password' });
+      .json({ status: false, message: statusCodeMessages[400] });
   }
 
   try {
@@ -79,14 +86,17 @@ module.exports.signin = async (req, res) => {
       user.password
     );
     if (!isPasswordMatched) {
-      res
-        .status(400)
-        .send({ status: false, message: 'wrong email or password' });
+      return res
+        .status(401)
+        .json({ status: false, message: statusCodeMessages[401] });
     }
 
     const token = createNewToken(user);
-    res.status(200).json({ success: true, token });
+    return res
+      .status(200)
+      .json({ success: true, token, message: statusCodeMessages[200] });
   } catch (error) {
-    console.log(error.message);
+    console.log(error);
+    return res.status(500).json({ status: false, message: error.message });
   }
 };
