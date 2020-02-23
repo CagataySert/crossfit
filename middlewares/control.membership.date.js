@@ -1,7 +1,7 @@
 const controlMembershipDate = (req, res, next) => {
   try {
     //check user whether is admin or not.
-    if (req.user.isAdmin) {
+    if (req.user.role === 'admin') {
       return next();
     }
 

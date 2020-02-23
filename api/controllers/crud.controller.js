@@ -1,5 +1,5 @@
 const statusCodeMessages = require('../../utils/status.codes');
-const defaultErrorRes = { status: false, message: statusCodeMessages[500] };
+const accessControl = require('../../utils/access.control.roles');
 
 const getOne = model => async (req, res) => {
   const { attributes, where, order, limit } = req.body;

@@ -36,9 +36,10 @@ const User = db.define('user', {
     type: Sequelize.INTEGER,
     allowNull: true
   },
-  isAdmin: {
-    type: Sequelize.BOOLEAN,
-    defaultValue: false
+  role: {
+    type: Sequelize.ENUM,
+    defaultValue: 'member',
+    values: ['admin', 'member', 'coach']
   }
 });
 

@@ -8,7 +8,7 @@ const statusCodeMessages = require('../../utils/status.codes');
 const createUser = async (req, res) => {
   try {
     //check user if is admin
-    if (!req.user.isAdmin)
+    if (!req.user.role !== 'admin')
       return res.status(403).json({
         status: false,
         message: statusCodeMessages[403]
@@ -20,7 +20,7 @@ const createUser = async (req, res) => {
       email,
       startOfMembership,
       endOfMembership,
-      isAdmin
+      role
     } = req.body;
 
     if (!email || !firstName || !lastName) {
@@ -44,7 +44,7 @@ const createUser = async (req, res) => {
       password: hashPassword,
       startOfMembership,
       endOfMembership,
-      isAdmin
+      role
     });
 
     //send email to user to introduce his/her email is available.

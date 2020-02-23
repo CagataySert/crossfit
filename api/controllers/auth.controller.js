@@ -40,7 +40,7 @@ module.exports.signup = async (req, res) => {
       password,
       startOfMembership,
       endOfMembership,
-      isAdmin
+      role
     } = req.body;
 
     const newUser = await User.create({
@@ -50,7 +50,7 @@ module.exports.signup = async (req, res) => {
       password,
       startOfMembership,
       endOfMembership,
-      isAdmin
+      role
     });
 
     const token = createNewToken(newUser);
